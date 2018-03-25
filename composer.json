@@ -1,0 +1,20 @@
+{
+    "name": "filipegar/erede",
+    "description": "PHP agnostic implementation for e.Rede RESTful payment processing.",
+    "type": "library",
+    "require": {
+        "guzzlehttp/guzzle": "~6.0"
+    },
+    "authors": [
+        {
+            "name": "Filipe Garcia",
+            "email": "epilif09@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-0": {
+            "Filipegar\\eRede\\": "src/"
+        }
+    }
+}
