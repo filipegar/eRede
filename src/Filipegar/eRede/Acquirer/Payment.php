@@ -2,7 +2,6 @@
 
 namespace Filipegar\eRede\Acquirer;
 
-
 class Payment implements \JsonSerializable
 {
     private $amount;

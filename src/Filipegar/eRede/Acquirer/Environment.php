@@ -48,5 +48,4 @@ class Environment implements \Filipegar\eRede\Environment
     {
         return $this->api;
     }
-
 }

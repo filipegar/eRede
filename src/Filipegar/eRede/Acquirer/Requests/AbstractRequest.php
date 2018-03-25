@@ -105,5 +105,5 @@ abstract class AbstractRequest
      *
      * @return mixed
      */
-    protected abstract function unserialize($json);
+    abstract protected function unserialize($json);
 }

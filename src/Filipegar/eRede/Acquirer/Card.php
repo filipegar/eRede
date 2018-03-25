@@ -2,7 +2,6 @@
 
 namespace Filipegar\eRede\Acquirer;
 
-
 class Card implements \JsonSerializable
 {
     const TYPE_CREDITCARD = 'credit';

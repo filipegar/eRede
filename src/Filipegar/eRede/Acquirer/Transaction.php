@@ -69,9 +69,9 @@ class Transaction implements \JsonSerializable, Requestable
         $this->card = new Card();
         $this->card->populate($data);
 
-        if(isset($data->links)) {
+        if (isset($data->links)) {
             $this->links = [];
-            foreach($data->links as $link) {
+            foreach ($data->links as $link) {
                 array_push($this->links, $link);
             }
         }
@@ -278,14 +278,14 @@ class Transaction implements \JsonSerializable, Requestable
     public function toRequest()
     {
         $data = $this->jsonSerialize();
-        foreach($data as $key => $value) {
-            if(is_null($value)) {
+        foreach ($data as $key => $value) {
+            if (is_null($value)) {
                 unset($data[$key]);
             }
 
-            if(is_object($value)) {
-                foreach($value->jsonSerialize() as $prop => $val) {
-                    if(!is_null($val)) {
+            if (is_object($value)) {
+                foreach ($value->jsonSerialize() as $prop => $val) {
+                    if (!is_null($val)) {
                         $data[$prop] = $val;
                     }
                 }
