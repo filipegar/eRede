@@ -2,7 +2,9 @@
 
 namespace Filipegar\eRede\Acquirer;
 
+use Filipegar\eRede\Acquirer\Requests\CaptureTransactionRequest;
 use Filipegar\eRede\Acquirer\Requests\CreateTransactionRequest;
+use Filipegar\eRede\Acquirer\Requests\RefundTransactionRequest;
 use Filipegar\eRede\Merchant;
 
 /*
@@ -16,13 +18,13 @@ class ERedeClient
 
     /**
      * Create an instance of eRedeClient choosing the environment where the
-     * requests will be send
+     * requests will be send.
      *
      * @param Merchant $merchant
-     *            The merchant credentials (PV identification and token)
+     *            The merchant credentials (PV identification and token).
      * @param Environment environment
      *            The environment: {@link Environment::production()} or
-     *            {@link Environment::sandbox()}
+     *            {@link Environment::sandbox()}.
      */
     public function __construct(Merchant $merchant, Environment $environment = null)
     {
@@ -34,10 +36,69 @@ class ERedeClient
         $this->environment = $environment;
     }
 
+    /**
+     * Authorizes a card or Authorize and Capture a card transaction.
+     *
+     * @param Transaction $transaction
+     *          The built transaction.
+     * @return Transaction
+     *          A new transaction object with TID, NSU, authorizationCode, etc from Rede.
+     *
+     * @throws Requests\eRedeErrorException if anything gets wrong.
+     * @see <a href=
+     *      "https://www.userede.com.br/desenvolvedores/pt/produto/e-Rede#documentacao-codigos">Error
+     *      Codes</a>
+     */
     public function authorize(Transaction $transaction)
     {
         $createTransaction = new CreateTransactionRequest($this->merchant, $this->environment);
 
         return $createTransaction->execute($transaction);
+    }
+
+    /**
+     * Captures a card transaction.
+     *
+     * @param $transactionTid
+     *          The transaction TID gerenated by Rede.
+     * @param $amount
+     *          The total amount you would like to capture from the card.
+     * @return Transaction
+     *          A new transaction object with the same TID, but with a new NSU and authorizationCode from Rede.
+     *
+     * @throws Requests\eRedeErrorException if anything gets wrong.
+     * @see <a href=
+     *      "https://www.userede.com.br/desenvolvedores/pt/produto/e-Rede#documentacao-codigos">Error
+     *      Codes</a>
+     */
+    public function captureTransaction($transactionTid, $amount)
+    {
+        $transaction = (new Transaction())->setTid($transactionTid);
+        $transaction->payment($amount);
+
+        $captureTransaction = new CaptureTransactionRequest($this->merchant, $this->environment);
+
+        return $captureTransaction->execute($transaction);
+    }
+
+    /**
+     * Refunds a transaction.
+     *
+     * @param Refund $refund
+     *      The built refund object.
+     *
+     * @return Refund
+     *      A new refund object with same TID, refundId, cancelId and NSU from Rede.
+     *
+     * @throws Requests\eRedeErrorException if anything gets wrong.
+     * @see <a href=
+     *      "https://www.userede.com.br/desenvolvedores/pt/produto/e-Rede#documentacao-codigos">Error
+     *      Codes</a>
+     */
+    public function refundTransaction(Refund $refund)
+    {
+        $refundTransaction = new RefundTransactionRequest($this->merchant, $this->environment);
+
+        return $refundTransaction->execute($refund);
     }
 }

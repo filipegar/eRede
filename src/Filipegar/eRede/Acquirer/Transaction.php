@@ -3,9 +3,12 @@
 namespace Filipegar\eRede\Acquirer;
 
 use Filipegar\eRede\Acquirer\Requests\Requestable;
+use Filipegar\eRede\Acquirer\Traits\DoesRequests;
 
 class Transaction implements \JsonSerializable, Requestable
 {
+    use DoesRequests;
+
     const ORIGIN_EREDE = 1;
     const ORIGIN_VISACHECKOUT = 4;
     const ORIGIN_MASTERPASS = 6;
@@ -69,6 +72,9 @@ class Transaction implements \JsonSerializable, Requestable
         $this->card = new Card();
         $this->card->populate($data);
 
+        $this->threeDSecure = new ThreeDSecure();
+        $this->threeDSecure->populate($data);
+
         if (isset($data->links)) {
             $this->links = [];
             foreach ($data->links as $link) {
@@ -110,7 +116,9 @@ class Transaction implements \JsonSerializable, Requestable
      */
     public function setReference($reference)
     {
-        $this->reference = substr($reference, 0, 16);
+        if (!is_null($reference)) {
+            $this->reference = substr($reference, 0, 16);
+        }
 
         return $this;
     }
@@ -211,20 +219,24 @@ class Transaction implements \JsonSerializable, Requestable
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getThreeDSecureUrls()
+    public function getUrls()
     {
         return $this->urls;
     }
 
     /**
-     * @param mixed $urls
+     * @param Url $url
      * @return Transaction
      */
-    public function setThreeDSecureUrls($urls)
+    public function setUrl(Url $url)
     {
-        $this->urls = $urls;
+        if (empty($this->urls)) {
+            $this->urls = [];
+        }
+
+        array_push($this->urls, $url);
 
         return $this;
     }
@@ -268,32 +280,87 @@ class Transaction implements \JsonSerializable, Requestable
     }
 
     /**
+     * @return mixed
+     */
+    public function getTid()
+    {
+        return $this->tid;
+    }
+
+    /**
+     * @param mixed $tid
+     * @return Transaction
+     */
+    public function setTid($tid)
+    {
+        $this->tid = $tid;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNsu()
+    {
+        return $this->nsu;
+    }
+
+    /**
+     * @param mixed $nsu
+     * @return Transaction
+     */
+    public function setNsu($nsu)
+    {
+        $this->nsu = $nsu;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAuthorizationCode()
+    {
+        return $this->authorizationCode;
+    }
+
+    /**
+     * @param mixed $authorizationCode
+     * @return Transaction
+     */
+    public function setAuthorizationCode($authorizationCode)
+    {
+        $this->authorizationCode = $authorizationCode;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateTime()
+    {
+        return $this->dateTime;
+    }
+
+    /**
+     * @param mixed $dateTime
+     * @return Transaction
+     */
+    public function setDateTime($dateTime)
+    {
+        $this->dateTime = $dateTime;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function jsonSerialize()
     {
         return get_object_vars($this);
-    }
-
-    public function toRequest()
-    {
-        $data = $this->jsonSerialize();
-        foreach ($data as $key => $value) {
-            if (is_null($value)) {
-                unset($data[$key]);
-            }
-
-            if (is_object($value)) {
-                foreach ($value->jsonSerialize() as $prop => $val) {
-                    if (!is_null($val)) {
-                        $data[$prop] = $val;
-                    }
-                }
-                unset($data[$key]);
-            }
-        }
-
-        return json_encode($data);
     }
 
     /**
@@ -349,67 +416,25 @@ class Transaction implements \JsonSerializable, Requestable
         return $card;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getTid()
+    public function threeDSecure($mpi = ThreeDSecure::MPI_EREDE, $onFailure = ThreeDSecure::FAILURE_DECLINE)
     {
-        return $this->tid;
+        $threeDScure = new ThreeDSecure();
+
+        $threeDScure->setEmbedded($mpi);
+        $threeDScure->setOnFailure($onFailure);
+        $this->setThreeDSecure($threeDScure);
+
+        return $threeDScure;
     }
 
-    /**
-     * @param mixed $tid
-     */
-    public function setTid($tid)
+    public function url($url, $urlKind)
     {
-        $this->tid = $tid;
-    }
+        $link = new Url();
+        $link->setKind($urlKind);
+        $link->setUrl($url);
 
-    /**
-     * @return mixed
-     */
-    public function getNsu()
-    {
-        return $this->nsu;
-    }
+        $this->setUrl($link);
 
-    /**
-     * @param mixed $nsu
-     */
-    public function setNsu($nsu)
-    {
-        $this->nsu = $nsu;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getAuthorizationCode()
-    {
-        return $this->authorizationCode;
-    }
-
-    /**
-     * @param mixed $authorizationCode
-     */
-    public function setAuthorizationCode($authorizationCode)
-    {
-        $this->authorizationCode = $authorizationCode;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDateTime()
-    {
-        return $this->dateTime;
-    }
-
-    /**
-     * @param mixed $dateTime
-     */
-    public function setDateTime($dateTime)
-    {
-        $this->dateTime = $dateTime;
+        return $this;
     }
 }

@@ -4,12 +4,43 @@ namespace Filipegar\eRede\Acquirer;
 
 class ThreeDSecure implements \JsonSerializable
 {
+    const FAILURE_DECLINE = 'decline';
+    const FAILURE_CONTINUE = 'continue';
+    const MPI_EREDE = true;
+    const MPI_CUSTOMER = false;
+
     private $embedded;
     private $onFailure;
     private $eci;
     private $cavv;
     private $xid;
     private $userAgent;
+    private $redirectUrl;
+    private $returnCode;
+    private $returnMessage;
+
+    public static function fromJson($json)
+    {
+        $object = json_decode($json);
+
+        $payment = new Payment();
+        $payment->populate($object);
+
+        return $payment;
+    }
+
+    public function populate(\stdClass $data)
+    {
+        if (isset($data->threeDSecure)) {
+            $this->redirectUrl = isset($data->threeDSecure->url) ? $data->threeDSecure->url : null;
+            $this->eci = isset($data->threeDSecure->eci) ? $data->threeDSecure->eci : null;
+            $this->cavv = isset($data->threeDSecure->cavv) ? $data->threeDSecure->cavv : null;
+            $this->xid = isset($data->threeDSecure->xid) ? $data->threeDSecure->xid : null;
+            $this->returnCode = isset($data->threeDSecure->returnCode) ? $data->threeDSecure->returnCode : null;
+            $this->returnMessage = isset($data->threeDSecure->returnMessage) ? $data->threeDSecure->returnMessage
+                : null;
+        }
+    }
 
     /**
      * @return string
@@ -24,7 +55,7 @@ class ThreeDSecure implements \JsonSerializable
      */
     public function setEmbedded($embedded)
     {
-        $this->embedded = $embedded;
+        $this->embedded = boolval($embedded);
     }
 
     /**
@@ -108,10 +139,65 @@ class ThreeDSecure implements \JsonSerializable
     }
 
     /**
+     * @return mixed
+     */
+    public function getRedirectUrl()
+    {
+        return $this->redirectUrl;
+    }
+
+    /**
+     * @param mixed $redirectUrl
+     */
+    public function setRedirectUrl($redirectUrl)
+    {
+        $this->redirectUrl = $redirectUrl;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getReturnMessage()
+    {
+        return $this->returnMessage;
+    }
+
+    /**
+     * @param mixed $returnMessage
+     */
+    public function setReturnMessage($returnMessage)
+    {
+        $this->returnMessage = $returnMessage;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getReturnCode()
+    {
+        return $this->returnCode;
+    }
+
+    /**
+     * @param mixed $returnCode
+     */
+    public function setReturnCode($returnCode)
+    {
+        $this->returnCode = $returnCode;
+    }
+
+    /**
      * @return array
      */
     public function jsonSerialize()
     {
-        return get_object_vars($this);
+        $data = get_object_vars($this);
+        foreach ($data as $key => $value) {
+            if (is_null($value)) {
+                unset($data[$key]);
+            }
+        }
+
+        return $data;
     }
 }

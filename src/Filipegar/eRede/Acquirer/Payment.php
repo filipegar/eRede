@@ -48,7 +48,7 @@ class Payment implements \JsonSerializable
      */
     public function setAmount($amount)
     {
-        $this->amount = $amount;
+        $this->amount = intval($amount);
 
         return $this;
     }

@@ -80,7 +80,12 @@ abstract class AbstractRequest
         } catch (RequestException $exception) {
             if ($exception->hasResponse()) {
                 $response = $exception->getResponse();
-                throw new ERedeErrorException($response->getBody(), $response->getStatusCode(), $exception);
+                $body = json_decode((string) $response->getBody());
+
+                $message = isset($body->returnMessage) ? $body->returnMessage : "Erro indeterminado.";
+                $code = isset($body->returnCode) ? $body->returnCode : $response->getStatusCode();
+
+                throw new ERedeErrorException($message, $code, $exception);
             } else {
                 throw new ERedeErrorException("Erro indeterminado.", 999, $exception);
             }

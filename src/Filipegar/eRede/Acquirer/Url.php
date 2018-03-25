@@ -2,11 +2,11 @@
 
 namespace Filipegar\eRede\Acquirer;
 
-class ThreeDSecureUrl implements \JsonSerializable
+class Url implements \JsonSerializable
 {
-    const URL_SUCCESS = 'ThreeDSecureSuccess';
-    const URL_FAILURE = 'ThreeDSecureFailure';
-    const CALLBACK = 'Callback';
+    const URL_SUCCESS = 'threeDSecureSuccess';
+    const URL_FAILURE = 'threeDSecureFailure';
+    const URL_CALLBACK = 'callback';
 
     private $kind;
     private $url;
@@ -40,7 +40,9 @@ class ThreeDSecureUrl implements \JsonSerializable
      */
     public function setUrl($url)
     {
-        $this->url = $url;
+        if (filter_var($url, FILTER_VALIDATE_URL)) {
+            $this->url = $url;
+        }
     }
 
     /**
