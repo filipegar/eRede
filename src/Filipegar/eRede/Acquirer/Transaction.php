@@ -30,6 +30,7 @@ class Transaction implements \JsonSerializable, Requestable
     private $returnCode;
     private $returnMessage;
     private $links;
+    private $status;
 
     public function __construct($reference = null, $origin = self::ORIGIN_EREDE)
     {
@@ -65,6 +66,9 @@ class Transaction implements \JsonSerializable, Requestable
         $this->authorizationCode = isset($data->authorizationCode) ? $data->authorizationCode : null;
         $this->dateTime = isset($data->dateTime) ? \DateTime::createFromFormat(\DateTime::ISO8601, $data->dateTime)
             : null;
+        $this->softDescriptor = isset($data->softDescriptor) ? $data->softDescriptor : null;
+        $this->subscription = isset($data->subscription) ? boolval($data->subscription) : null;
+        $this->status = isset($data->status) ? $data->status : null;
 
         $this->payment = new Payment();
         $this->payment->populate($data);
@@ -353,6 +357,14 @@ class Transaction implements \JsonSerializable, Requestable
         $this->dateTime = $dateTime;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus()
+    {
+        return $this->status;
     }
 
     /**

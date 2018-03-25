@@ -35,6 +35,7 @@ class Card implements \JsonSerializable
     {
         $this->cardBin = isset($data->cardBin) ? $data->cardBin : null;
         $this->last4 = isset($data->last4) ? $data->last4 : null;
+        $this->kind = isset($data->kind) ? $data->kind : null;
     }
 
     /**

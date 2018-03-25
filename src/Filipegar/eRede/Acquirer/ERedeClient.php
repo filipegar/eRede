@@ -4,6 +4,7 @@ namespace Filipegar\eRede\Acquirer;
 
 use Filipegar\eRede\Acquirer\Requests\CaptureTransactionRequest;
 use Filipegar\eRede\Acquirer\Requests\CreateTransactionRequest;
+use Filipegar\eRede\Acquirer\Requests\QueryTransactionRequest;
 use Filipegar\eRede\Acquirer\Requests\RefundTransactionRequest;
 use Filipegar\eRede\Merchant;
 
@@ -100,5 +101,43 @@ class ERedeClient
         $refundTransaction = new RefundTransactionRequest($this->merchant, $this->environment);
 
         return $refundTransaction->execute($refund);
+    }
+
+    /**
+     * Query a transaction on Rede via TID.
+     *
+     * @param $transactionTid
+     *      The transaction TID gerenated by Rede.
+     *
+     * @return QueryTransaction
+     *      A Query Transaction object with a Transaction object, capture details and refunds (if any).
+     * @throws Requests\eRedeErrorException
+     */
+    public function queryTransaction($transactionTid)
+    {
+        $transaction = (new Transaction())->setTid($transactionTid);
+
+        $queryTransaction = new QueryTransactionRequest($this->merchant, $this->environment);
+
+        return $queryTransaction->execute($transaction);
+    }
+
+    /**
+     * Query a transaction on Rede via Store Reference.
+     *
+     * @param $storeReference
+     *      The reference gerenated by you when sending the authorize request.
+     *
+     * @return QueryTransaction
+     *      A Query Transaction object with a Transaction object, capture details and refunds (if any).
+     * @throws Requests\eRedeErrorException
+     */
+    public function queryTransactionReference($storeReference)
+    {
+        $transaction = (new Transaction())->setReference($storeReference);
+
+        $queryTransaction = new QueryTransactionRequest($this->merchant, $this->environment);
+
+        return $queryTransaction->execute($transaction);
     }
 }
