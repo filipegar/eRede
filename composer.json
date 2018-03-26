@@ -1,8 +1,11 @@
 {
     "name": "filipegar/erede",
     "description": "PHP agnostic implementation for e.Rede RESTful payment processing.",
+    "keywords": ["framework", "agnostic", "rest", "e.Rede", "redecard", "userede", "credit card brazil", "erede"],
     "type": "library",
+    "license": "MIT",
     "require": {
+        "php": ">=5.6",
         "guzzlehttp/guzzle": "~6.0"
     },
     "authors": [
