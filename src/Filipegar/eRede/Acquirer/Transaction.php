@@ -428,12 +428,14 @@ class Transaction implements \JsonSerializable, Requestable
         return $card;
     }
 
-    public function threeDSecure($mpi = ThreeDSecure::MPI_EREDE, $onFailure = ThreeDSecure::FAILURE_DECLINE)
+    public function threeDSecure($mpi = ThreeDSecure::MPI_EREDE, $onFailure = ThreeDSecure::FAILURE_DECLINE, $directoryServerTransactionId = "",  $threeDIndicator = "2")
     {
         $threeDScure = new ThreeDSecure();
 
         $threeDScure->setEmbedded($mpi);
         $threeDScure->setOnFailure($onFailure);
+        $threeDScure->setDirectoryServerTransactionId($directoryServerTransactionId);
+        $threeDScure->setThreeDIndicator($threeDIndicator);
         $this->setThreeDSecure($threeDScure);
 
         return $threeDScure;
