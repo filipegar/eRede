@@ -2,6 +2,7 @@
 
 namespace Filipegar\eRede\Acquirer\Requests;
 
+use Filipegar\eRede\Acquirer\Auth\OAuthClientCredentialsAuthentication;
 use Filipegar\eRede\Acquirer\Environment;
 use Filipegar\eRede\Merchant;
 use GuzzleHttp\Client;
@@ -16,15 +17,22 @@ use GuzzleHttp\Psr7\Response;
 abstract class AbstractRequest
 {
     private $merchant;
+    private $authentication;
 
     /**
      * AbstractSaleRequest constructor.
      *
      * @param Merchant $merchant
      */
-    public function __construct(Merchant $merchant)
+    public function __construct(Merchant $merchant, OAuthClientCredentialsAuthentication $authentication = null)
     {
         $this->merchant = $merchant;
+
+        if ($authentication === null) {
+            $authentication = new OAuthClientCredentialsAuthentication();
+        }
+
+        $this->authentication = $authentication;
     }
 
     /**
@@ -53,19 +61,8 @@ abstract class AbstractRequest
             'RequestId' => uniqid(),
         ];
 
-        $client = new Client([
-            'base_uri' => $environment->getApiUrl(),
-            'auth' => [$this->merchant->getAffiliation(), $this->merchant->getToken()],
-            'headers' => $headers,
-            'verify' => true,
-            'defaults' => [
-                'config' => [
-                    'curl' => [
-                        CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2
-                    ]
-                ]
-            ]
-        ]);
+        $clientOptions = $this->authentication->getClientOptions($environment, $this->merchant, $headers);
+        $client = new Client($clientOptions);
 
         if ($content !== null) {
             $options = [

@@ -2,6 +2,7 @@
 
 namespace Filipegar\eRede\Acquirer;
 
+use Filipegar\eRede\Acquirer\Auth\OAuthClientCredentialsAuthentication;
 use Filipegar\eRede\Acquirer\Requests\CaptureTransactionRequest;
 use Filipegar\eRede\Acquirer\Requests\CreateTransactionRequest;
 use Filipegar\eRede\Acquirer\Requests\QueryTransactionRequest;
@@ -16,6 +17,7 @@ class ERedeClient
 {
     private $merchant;
     private $environment;
+    private $authentication;
 
     /**
      * Create an instance of eRedeClient choosing the environment where the
@@ -26,8 +28,13 @@ class ERedeClient
      * @param Environment environment
      *            The environment: {@link Environment::production()} or
      *            {@link Environment::sandbox()}.
+     * @param OAuthClientCredentialsAuthentication|null $authentication
      */
-    public function __construct(Merchant $merchant, Environment $environment = null)
+    public function __construct(
+        Merchant $merchant,
+        Environment $environment = null,
+        OAuthClientCredentialsAuthentication $authentication = null
+    )
     {
         if ($environment == null) {
             $environment = Environment::production();
@@ -35,6 +42,12 @@ class ERedeClient
 
         $this->merchant = $merchant;
         $this->environment = $environment;
+
+        if ($authentication === null) {
+            $authentication = new OAuthClientCredentialsAuthentication();
+        }
+
+        $this->authentication = $authentication;
     }
 
     /**
@@ -52,7 +65,7 @@ class ERedeClient
      */
     public function authorize(Transaction $transaction)
     {
-        $createTransaction = new CreateTransactionRequest($this->merchant, $this->environment);
+        $createTransaction = new CreateTransactionRequest($this->merchant, $this->environment, $this->authentication);
 
         return $createTransaction->execute($transaction);
     }
@@ -77,7 +90,7 @@ class ERedeClient
         $transaction = (new Transaction())->setTid($transactionTid);
         $transaction->payment($amount);
 
-        $captureTransaction = new CaptureTransactionRequest($this->merchant, $this->environment);
+        $captureTransaction = new CaptureTransactionRequest($this->merchant, $this->environment, $this->authentication);
 
         return $captureTransaction->execute($transaction);
     }
@@ -98,7 +111,7 @@ class ERedeClient
      */
     public function refundTransaction(Refund $refund)
     {
-        $refundTransaction = new RefundTransactionRequest($this->merchant, $this->environment);
+        $refundTransaction = new RefundTransactionRequest($this->merchant, $this->environment, $this->authentication);
 
         return $refundTransaction->execute($refund);
     }
@@ -117,7 +130,7 @@ class ERedeClient
     {
         $transaction = (new Transaction())->setTid($transactionTid);
 
-        $queryTransaction = new QueryTransactionRequest($this->merchant, $this->environment);
+        $queryTransaction = new QueryTransactionRequest($this->merchant, $this->environment, $this->authentication);
 
         return $queryTransaction->execute($transaction);
     }
@@ -136,7 +149,7 @@ class ERedeClient
     {
         $transaction = (new Transaction())->setReference($storeReference);
 
-        $queryTransaction = new QueryTransactionRequest($this->merchant, $this->environment);
+        $queryTransaction = new QueryTransactionRequest($this->merchant, $this->environment, $this->authentication);
 
         return $queryTransaction->execute($transaction);
     }

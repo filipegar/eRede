@@ -2,6 +2,7 @@
 
 namespace Filipegar\eRede\Acquirer\Requests;
 
+use Filipegar\eRede\Acquirer\Auth\OAuthClientCredentialsAuthentication;
 use Filipegar\eRede\Acquirer\Environment;
 use Filipegar\eRede\Acquirer\Refund;
 use Filipegar\eRede\Merchant;
@@ -10,9 +11,9 @@ class RefundTransactionRequest extends AbstractRequest
 {
     private $environment;
 
-    public function __construct(Merchant $merchant, Environment $environment)
+    public function __construct(Merchant $merchant, Environment $environment, OAuthClientCredentialsAuthentication $authentication = null)
     {
-        parent::__construct($merchant);
+        parent::__construct($merchant, $authentication);
 
         $this->environment = $environment;
     }

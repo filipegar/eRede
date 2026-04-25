@@ -1,4 +1,4 @@
-#e.Rede PHP SDK
+# e.Rede PHP SDK
 
 Esta é uma implementação framework agnostic em PHP dos serviços RESTful do e.Rede da [UseRede](https://www.userede.com.br/desenvolvedores/pt/produto/e-Rede#documentacao).
 
@@ -45,6 +45,68 @@ composer require "filipegar/erede"
 ```
 
 ## Utilizando o SDK
+
+### Autenticacao OAuth2 (client_credentials)
+
+O SDK usa OAuth2 por padrao (fluxo `client_credentials`).
+Esta é a única forma de autenticação suportada pelo serviço hoje.
+
+```php
+<?php
+require 'vendor/autoload.php';
+
+use Filipegar\eRede\Acquirer\Auth\OAuthClientCredentialsAuthentication;
+use Filipegar\eRede\Acquirer\Auth\Token\ArrayTokenCache;
+use Filipegar\eRede\Acquirer\ERedeClient;
+use Filipegar\eRede\Acquirer\Environment;
+use Filipegar\eRede\Merchant;
+
+$merchant = new Merchant('PVestabelecimento', 'TOKEN');
+$cache = new ArrayTokenCache(); // cache simples em memoria do processo PHP
+$oauth = OAuthClientCredentialsAuthentication::withCache($cache);
+
+$eRede = new ERedeClient($merchant, Environment::sandbox(), $oauth);
+```
+
+### Interface de cache para integrar com frameworks
+
+O cache de token e opcional. Sem cache, o SDK requisita um novo token para cada chamada.
+Com cache, o token e reaproveitado ate proximo da expiracao.
+
+
+Para integrar com Laravel (ou qualquer outro framework), implemente a interface
+`Filipegar\eRede\Acquirer\Auth\Token\TokenCacheInterface`:
+
+```php
+<?php
+
+use Filipegar\eRede\Acquirer\Auth\Token\TokenCacheInterface;
+
+class LaravelTokenCache implements TokenCacheInterface
+{
+    private $store;
+
+    public function __construct($store)
+    {
+        $this->store = $store; // Ex.: app('cache.store')
+    }
+
+    public function get($key)
+    {
+        return $this->store->get($key);
+    }
+
+    public function set($key, $value, $ttl)
+    {
+        $this->store->put($key, $value, $ttl);
+    }
+
+    public function delete($key)
+    {
+        $this->store->forget($key);
+    }
+}
+```
 
 Para criar um pagamento simples com cartão de crédito com o SDK, basta fazer:
 
