@@ -43,7 +43,7 @@ class Environment implements \Filipegar\eRede\Environment
     public static function production()
     {
         $api = 'https://api.userede.com.br/erede/v2/';
-        $oauth = 'https://rl7-sandbox-api.useredecloud.com.br';
+        $oauth = 'https://api.userede.com.br/';
         return new Environment($api, $oauth, 'redelabs/oauth2/token');
     }
 
