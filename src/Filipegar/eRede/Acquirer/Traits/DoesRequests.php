@@ -10,6 +10,9 @@ trait DoesRequests
     public function toRequest()
     {
         $data = $this->jsonSerialize();
+        // brand é somente retorno da Rede, nunca é enviado.
+        unset($data['brand']);
+
         foreach ($data as $key => $value) {
             if (is_null($value)) {
                 unset($data[$key]);

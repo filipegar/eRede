@@ -26,6 +26,7 @@ class Transaction implements \JsonSerializable, Requestable
     private $tid;
     private $nsu;
     private $authorizationCode;
+    private $brand;
     private $dateTime;
     private $returnCode;
     private $returnMessage;
@@ -64,6 +65,7 @@ class Transaction implements \JsonSerializable, Requestable
         $this->tid = isset($data->tid) ? $data->tid : null;
         $this->nsu = isset($data->nsu) ? $data->nsu : null;
         $this->authorizationCode = isset($data->authorizationCode) ? $data->authorizationCode : null;
+        $this->brand = isset($data->brand) ? $data->brand : null;
         $this->dateTime = isset($data->dateTime) ? \DateTime::createFromFormat(\DateTime::ISO8601, $data->dateTime)
             : null;
         $this->softDescriptor = isset($data->softDescriptor) ? $data->softDescriptor : null;
@@ -338,6 +340,16 @@ class Transaction implements \JsonSerializable, Requestable
         $this->authorizationCode = $authorizationCode;
 
         return $this;
+    }
+
+    /**
+     * Dados da bandeira retornados pela Rede (name, returnCode, returnMessage, authorizationCode, brandTid).
+     *
+     * @return \stdClass|null
+     */
+    public function getBrand()
+    {
+        return $this->brand;
     }
 
     /**
