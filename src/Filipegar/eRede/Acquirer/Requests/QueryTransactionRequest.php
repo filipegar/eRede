@@ -12,7 +12,7 @@ class QueryTransactionRequest extends AbstractRequest
 {
     private $environment;
 
-    public function __construct(Merchant $merchant, Environment $environment, OAuthClientCredentialsAuthentication $authentication = null)
+    public function __construct(Merchant $merchant, Environment $environment, ?OAuthClientCredentialsAuthentication $authentication = null)
     {
         parent::__construct($merchant, $authentication);
 

@@ -12,7 +12,7 @@ class OAuthClientCredentialsAuthentication
 {
     private $tokenProvider;
 
-    public function __construct(TokenProviderInterface $tokenProvider = null)
+    public function __construct(?TokenProviderInterface $tokenProvider = null)
     {
         if ($tokenProvider === null) {
             $tokenProvider = new ClientCredentialsTokenProvider();
@@ -28,7 +28,7 @@ class OAuthClientCredentialsAuthentication
      *
      * @return self
      */
-    public static function withCache(TokenCacheInterface $cache = null)
+    public static function withCache(?TokenCacheInterface $cache = null)
     {
         return new self(new ClientCredentialsTokenProvider($cache));
     }

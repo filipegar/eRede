@@ -12,7 +12,7 @@ class ClientCredentialsTokenProvider implements TokenProviderInterface
 {
     private $cache;
 
-    public function __construct(TokenCacheInterface $cache = null)
+    public function __construct(?TokenCacheInterface $cache = null)
     {
         if ($cache === null) {
             $cache = new NullTokenCache();

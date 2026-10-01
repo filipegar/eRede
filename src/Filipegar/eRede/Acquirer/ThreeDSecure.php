@@ -189,6 +189,7 @@ class ThreeDSecure implements \JsonSerializable
     /**
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $data = get_object_vars($this);

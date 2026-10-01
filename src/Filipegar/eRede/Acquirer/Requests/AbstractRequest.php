@@ -24,7 +24,7 @@ abstract class AbstractRequest
      *
      * @param Merchant $merchant
      */
-    public function __construct(Merchant $merchant, OAuthClientCredentialsAuthentication $authentication = null)
+    public function __construct(Merchant $merchant, ?OAuthClientCredentialsAuthentication $authentication = null)
     {
         $this->merchant = $merchant;
 

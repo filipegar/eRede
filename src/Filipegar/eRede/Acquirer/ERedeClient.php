@@ -32,8 +32,8 @@ class ERedeClient
      */
     public function __construct(
         Merchant $merchant,
-        Environment $environment = null,
-        OAuthClientCredentialsAuthentication $authentication = null
+        ?Environment $environment = null,
+        ?OAuthClientCredentialsAuthentication $authentication = null
     )
     {
         if ($environment == null) {
